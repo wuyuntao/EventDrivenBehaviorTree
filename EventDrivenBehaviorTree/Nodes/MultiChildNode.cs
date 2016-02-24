@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace EventDrivenBehaviorTree
+namespace EventDrivenBehaviorTree.Nodes
 {
     abstract class MultiChildNode : Node
     {

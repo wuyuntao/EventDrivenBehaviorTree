@@ -7,22 +7,22 @@
         {
         }
 
-        public override void Start()
+        public override void OnStart()
         {
             Tree.OnNodeEvent += Tree_OnNodeEvent;
-            Child.Start();
+            Child.OnStart();
         }
 
-        private void Tree_OnNodeEvent(Node sender, NodeEventArgs eventArgs)
+        private void Tree_OnNodeEvent(Node sender, EventArgs eventArgs)
         {
             if (sender == Child && eventArgs is NodeFinishedEventArgs)
-                End(false);
+                OnEnd(false);
         }
 
-        protected override void End(bool success)
+        protected override void OnEnd(bool success)
         {
             Tree.OnNodeEvent -= Tree_OnNodeEvent;
-            base.End(success);
+            base.OnEnd(success);
         }
     }
 }

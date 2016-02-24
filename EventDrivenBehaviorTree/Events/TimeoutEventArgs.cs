@@ -1,6 +1,8 @@
-﻿namespace EventDrivenBehaviorTree
+﻿using System;
+
+namespace EventDrivenBehaviorTree.Events
 {
-    class TimeoutEventArgs : NodeEventArgs
+    class TimeoutEventArgs : EventArgs
     {
         public readonly int TimerId;
 

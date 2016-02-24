@@ -12,7 +12,7 @@ namespace EventDrivenBehaviorTree
         {
         }
 
-        public override void Start()
+        public override void OnStart()
         {
             childrenCompleted = new bool[Children.Length];
 
@@ -20,17 +20,17 @@ namespace EventDrivenBehaviorTree
 
             foreach (var child in Children)
             {
-                child.Start();
+                child.OnStart();
             }
         }
 
-        public override void Abort()
+        public override void OnAbort()
         {
             AbortChildren();
-            base.Abort();
+            base.OnAbort();
         }
 
-        private void Tree_OnNodeEvent(Node sender, NodeEventArgs eventArgs)
+        private void Tree_OnNodeEvent(Node sender, EventArgs eventArgs)
         {
             var index = Array.FindIndex(Children, c => c == sender);
             if (index >= 0 && eventArgs is NodeFinishedEventArgs)
@@ -40,12 +40,12 @@ namespace EventDrivenBehaviorTree
                 {
                     childrenCompleted[index] = success;
                     if (childrenCompleted.All(c => c))
-                        End(false);
+                        OnEnd(false);
                 }
                 else
                 {
                     AbortChildren();
-                    End(true);
+                    OnEnd(true);
                 }
             }
         }
@@ -55,7 +55,7 @@ namespace EventDrivenBehaviorTree
             for (int i = 0; i < Children.Length; i++)
             {
                 if (!childrenCompleted[i])
-                    Children[i].Abort();
+                    Children[i].OnAbort();
             }
         }
     }

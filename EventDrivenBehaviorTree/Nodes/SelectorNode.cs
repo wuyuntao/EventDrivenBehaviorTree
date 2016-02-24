@@ -1,53 +1,52 @@
 ﻿namespace EventDrivenBehaviorTree
 {
-    class SequenceNode : MultiChildNode
+    class SelectorNode : MultiChildNode
     {
         int currentIndex;
 
-        public SequenceNode(BehaviorTree tree, Node parent)
+        public SelectorNode(BehaviorTree tree, Node parent)
             : base(tree, parent)
         {
         }
 
-        public override void Start()
+        public override void OnStart()
         {
             currentIndex = 0;
 
             Tree.OnNodeEvent += Tree_OnNodeEvent;
 
-            Children[currentIndex].Start();
-
+            Children[currentIndex].OnStart();
         }
 
-        private void Tree_OnNodeEvent(Node sender, NodeEventArgs eventArgs)
+        private void Tree_OnNodeEvent(Node sender, EventArgs eventArgs)
         {
             var child = Children[currentIndex];
             if (child == sender && eventArgs is NodeFinishedEventArgs)
             {
                 var finishedEventArgs = (NodeFinishedEventArgs)eventArgs;
-                if (finishedEventArgs.Success)
+                if (!finishedEventArgs.Success)
                 {
                     if (++currentIndex < Children.Length)
                     {
-                        Children[currentIndex].Start();
+                        Children[currentIndex].OnStart();
                     }
                     else
                     {
-                        End(true);
+                        OnEnd(false);
                     }
                 }
                 else
                 {
-                    End(false);
+                    OnEnd(true);
                 }
             }
         }
 
-        protected override void End(bool success)
+        protected override void OnEnd(bool success)
         {
             Tree.OnNodeEvent -= Tree_OnNodeEvent;
 
-            base.End(success);
+            base.OnEnd(success);
         }
     }
 }

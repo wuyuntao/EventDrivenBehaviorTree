@@ -41,25 +41,26 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BehaviorTree.cs" />
-    <Compile Include="LeafNode.cs" />
-    <Compile Include="MultiChildNode.cs" />
-    <Compile Include="Node.cs" />
-    <Compile Include="NodeEventArgs.cs" />
-    <Compile Include="NodeFinishedEventArgs.cs" />
-    <Compile Include="ParallelNode.cs" />
-    <Compile Include="ParallelSelectorNode.cs" />
+    <Compile Include="Events\EventObject.cs" />
+    <Compile Include="Events\NodeStartedEventArgs.cs" />
+    <Compile Include="Nodes\LeafNode.cs" />
+    <Compile Include="Nodes\MultiChildNode.cs" />
+    <Compile Include="Nodes\Node.cs" />
+    <Compile Include="Events\NodeCompletedEventArgs.cs" />
+    <Compile Include="Nodes\ParallelNode.cs" />
+    <Compile Include="Nodes\ParallelSelectorNode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RepeaterNode.cs" />
-    <Compile Include="ReturnFalseNode.cs" />
-    <Compile Include="SelectorNode.cs" />
-    <Compile Include="SendEventNode.cs" />
-    <Compile Include="SequenceNode.cs" />
-    <Compile Include="SingleChildNode.cs" />
-    <Compile Include="Timer.cs" />
-    <Compile Include="TimeoutEventArgs.cs" />
-    <Compile Include="WaitEventNode.cs" />
-    <Compile Include="WaitNode.cs" />
+    <Compile Include="Nodes\RepeaterNode.cs" />
+    <Compile Include="Nodes\ReturnFalseNode.cs" />
+    <Compile Include="Nodes\SelectorNode.cs" />
+    <Compile Include="Nodes\SendEventNode.cs" />
+    <Compile Include="Nodes\SequenceNode.cs" />
+    <Compile Include="Nodes\SingleChildNode.cs" />
+    <Compile Include="Events\TimeoutEventArgs.cs" />
+    <Compile Include="Nodes\WaitEventNode.cs" />
+    <Compile Include="Nodes\WaitNode.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
