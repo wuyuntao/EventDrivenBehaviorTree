@@ -21,27 +21,20 @@ namespace EventDrivenBehaviorTree
         {
             if (m_pendingQueue.Count > 0)
             {
-                var currentQueue = new List<Node>();
-                while (m_pendingQueue.Count > 0)
+                for (int i = 0; i < m_pendingQueue.Count; i++)
                 {
-                    // Swap
-                    var queue = currentQueue;
-                    currentQueue = m_pendingQueue;
-                    m_pendingQueue = queue;
-
-                    // Update nodes
-                    foreach (var node in currentQueue)
-                        node.Update();
-
-                    currentQueue.Clear();
+                    var node = m_pendingQueue[i];
+                    node.Update();
                 }
+
+                m_pendingQueue.Clear();
+                m_pendingQueue.TrimExcess();
             }
         }
 
         internal void Enqueue(Node node)
         {
-            if (!m_pendingQueue.Contains(node))
-                m_pendingQueue.Add(node);
+            m_pendingQueue.Add(node);
         }
 
         public BehaviorTreeManager Manager
