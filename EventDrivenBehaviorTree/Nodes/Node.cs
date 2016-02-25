@@ -1,60 +1,71 @@
-﻿using EventDrivenBehaviorTree.Events;
-using System;
+﻿using System;
+using System.Collections.Generic;
 
 namespace EventDrivenBehaviorTree.Nodes
 {
     public abstract class Node
     {
         public readonly BehaviorTree Tree;
-        public readonly ParentNode Parent;
-        public bool IsRunning;
+        public readonly Node Parent;
+        bool m_isRunning;
+        bool? m_lastStatus;
 
-        protected Node(BehaviorTree tree, ParentNode parent)
+        protected Node(BehaviorTree tree, Node parent)
         {
             Tree = tree;
             Parent = parent;
         }
 
-        internal protected void Start()
+        internal void Update()
         {
-            if (IsRunning)
-                throw new InvalidOperationException();
+            if (!m_isRunning)
+            {
+                OnStart();
+                m_isRunning = true;
+                m_lastStatus = null;
+            }
 
-            IsRunning = true;
-            OnStart();
+            IEnumerable<Node> children;
+            var status = OnUpdate(out children);
+            if (status != null)
+            {
+                m_lastStatus = status;
+                m_isRunning = false;
+
+                OnEnd();
+
+                if (Parent != null)
+                    Tree.Enqueue(Parent);
+            }
+            else if (children != null)
+            {
+                foreach (var child in children)
+                    Tree.Enqueue(child);
+            }
         }
 
         internal protected void Abort()
         {
-            if (!IsRunning)
-                throw new InvalidOperationException();
+            if (!m_isRunning)
+                return;
 
-            OnAbort();
+            m_lastStatus = null;
+            m_isRunning = false;
 
-            End(false);
+            OnEnd();
         }
 
-        protected void End(bool success)
+        protected virtual void OnStart()
+        { }
+
+        protected abstract bool? OnUpdate(out IEnumerable<Node> children);
+
+        protected virtual void OnEnd()
+        { }
+
+        public bool? LastStatus
         {
-            if (!IsRunning)
-                throw new InvalidOperationException();
-
-            OnEnd(success);
-
-            if (Parent != null)
-                Parent.OnChildEnd(this, success);
-
-        }
-
-        protected abstract void OnStart();
-
-        protected virtual void OnEnd(bool success)
-        {
-            IsRunning = false;
-        }
-
-        protected virtual void OnAbort()
-        {
+            get { return m_lastStatus; }
         }
     }
 }

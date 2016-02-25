@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EventDrivenBehaviorTree.Nodes;
+using System;
 using System.Collections.Generic;
 
 namespace EventDrivenBehaviorTree.Events
@@ -12,7 +13,13 @@ namespace EventDrivenBehaviorTree.Events
             foreach (var subscriber in subscriptions)
             {
                 if (subscriber.EventType.IsAssignableFrom(eventArgs.GetType()))
+                {
                     subscriber.Subscriber.OnEvent(publisher, eventArgs);
+
+                    var node = subscriber.Subscriber as Node;
+                    if (node != null)
+                        node.Tree.Enqueue(node);
+                }
             }
         }
 

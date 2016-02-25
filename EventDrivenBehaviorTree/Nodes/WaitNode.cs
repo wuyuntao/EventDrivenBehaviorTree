@@ -1,14 +1,12 @@
-﻿using System;
-using EventDrivenBehaviorTree.Events;
+﻿using System.Collections.Generic;
 
 namespace EventDrivenBehaviorTree.Nodes
 {
-    class WaitNode : LeafNode, EventBus.ISubscriber
+    class WaitNode : LeafNode
     {
         readonly uint time;
-        int timerId;
 
-        public WaitNode(BehaviorTree tree, ParentNode parent, uint time)
+        public WaitNode(BehaviorTree tree, Node parent, uint time)
             : base(tree, parent)
         {
             this.time = time;
@@ -16,20 +14,14 @@ namespace EventDrivenBehaviorTree.Nodes
 
         protected override void OnStart()
         {
-            timerId = Tree.SetTimer(this, time);
-
-            Tree.EventBus.Subscribe(this, typeof(TimeoutEventArgs));
+            Tree.Manager.SetTimer(this, time);
         }
 
-        void EventBus.ISubscriber.OnEvent(EventBus.IPublisher publisher, EventArgs eventArgs)
+        protected override bool? OnUpdate(out IEnumerable<Node> children)
         {
-            var timeoutEventArgs = (eventArgs as TimeoutEventArgs);
-            if (timeoutEventArgs != null && timerId == timeoutEventArgs.TimerId)
-            {
-                Tree.EventBus.Unsubscribe(this);
+            children = null;
 
-                End(true);
-            }
+            return true;
         }
     }
 }

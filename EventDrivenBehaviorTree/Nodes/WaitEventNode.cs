@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using EventDrivenBehaviorTree.Events;
 
 namespace EventDrivenBehaviorTree.Nodes
@@ -7,7 +8,7 @@ namespace EventDrivenBehaviorTree.Nodes
     {
         Type eventType;
 
-        public WaitEventNode(BehaviorTree tree, ParentNode parent, Type eventType)
+        public WaitEventNode(BehaviorTree tree, Node parent, Type eventType)
             : base(tree, parent)
         {
             this.eventType = eventType;
@@ -18,13 +19,16 @@ namespace EventDrivenBehaviorTree.Nodes
             Tree.EventBus.Subscribe(this, eventType);
         }
 
+        protected override bool? OnUpdate(out IEnumerable<Node> children)
+        {
+            children = null;
+
+            return true;
+        }
+
         void EventBus.ISubscriber.OnEvent(EventBus.IPublisher publisher, EventArgs eventArgs)
         {
-            if (eventArgs.GetType() == eventType)
-            {
-                Tree.EventBus.Unsubscribe(this);
-                End(true);
-            }
+            Tree.EventBus.Unsubscribe(this);
         }
     }
 }

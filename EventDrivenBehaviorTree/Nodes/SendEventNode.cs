@@ -1,5 +1,6 @@
 ﻿using EventDrivenBehaviorTree.Events;
 using System;
+using System.Collections.Generic;
 
 namespace EventDrivenBehaviorTree.Nodes
 {
@@ -7,7 +8,7 @@ namespace EventDrivenBehaviorTree.Nodes
     {
         EventArgs eventArgs;
 
-        public SendEventNode(BehaviorTree tree, ParentNode parent, EventArgs eventArgs)
+        public SendEventNode(BehaviorTree tree, Node parent, EventArgs eventArgs)
             : base(tree, parent)
         {
             this.eventArgs = eventArgs;
@@ -16,6 +17,12 @@ namespace EventDrivenBehaviorTree.Nodes
         protected override void OnStart()
         {
             Tree.EventBus.Publish(this, eventArgs);
+        }
+
+        protected override bool? OnUpdate(out IEnumerable<Node> children)
+        {
+            children = null;
+            return true;
         }
     }
 }

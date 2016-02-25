@@ -1,40 +1,61 @@
-﻿namespace EventDrivenBehaviorTree.Nodes
+﻿using System.Collections.Generic;
+
+namespace EventDrivenBehaviorTree.Nodes
 {
     public class SequenceNode : MultiChildNode
     {
-        int currentIndex;
+        int m_currentIndex;
 
-        public SequenceNode(BehaviorTree tree, ParentNode parent)
+        public SequenceNode(BehaviorTree tree, Node parent)
             : base(tree, parent)
         {
         }
 
         protected override void OnStart()
         {
-            currentIndex = 0;
-
-            Children[currentIndex].Start();
-
+            m_currentIndex = -1;
         }
 
-        internal override void OnChildEnd(Node child, bool success)
+        protected override bool? OnUpdate(out IEnumerable<Node> children)
         {
-            if (success)
+            children = null;
+
+            if (m_currentIndex < 0)
             {
-                if (++currentIndex < Children.Length)
-                    Children[currentIndex].Start();
-                else
-                    OnEnd(true);
+                m_currentIndex = 0;
+                children = new[] { Children[m_currentIndex] };
+                return null;
             }
             else
-                OnEnd(false);
+            {
+                var child = Children[m_currentIndex];
+                if (child.LastStatus.Value)
+                {
+                    if (++m_currentIndex < Children.Length)
+                    {
+                        children = new[] { Children[m_currentIndex] };
+                        return null;
+                    }
+                    else
+                    {
+                        children = null;
+                        return true;
+                    }
+                }
+                else
+                {
+                    children = null;
+                    return false;
+                }
+            }
         }
 
-        protected override void OnAbort()
+        protected override void OnEnd()
         {
-            Children[currentIndex].Abort();
+            if (LastStatus == null)
+                Children[m_currentIndex].Abort();
 
-            base.OnAbort();
+            base.OnEnd();
         }
     }
 }

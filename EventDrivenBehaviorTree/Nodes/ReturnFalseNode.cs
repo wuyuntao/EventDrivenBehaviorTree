@@ -1,20 +1,27 @@
-﻿namespace EventDrivenBehaviorTree.Nodes
+﻿using System;
+using System.Collections.Generic;
+
+namespace EventDrivenBehaviorTree.Nodes
 {
     class ReturnFalseNode : SingleChildNode
     {
-        public ReturnFalseNode(BehaviorTree tree, ParentNode parent)
+        public ReturnFalseNode(BehaviorTree tree, Node parent)
             : base(tree, parent)
         {
         }
 
         protected override void OnStart()
         {
-            Child.Start();
+            base.OnStart();
+
+            Tree.Enqueue(Child);
         }
 
-        internal override void OnChildEnd(Node child, bool success)
+        protected override bool? OnUpdate(out IEnumerable<Node> children)
         {
-            OnEnd(false);
+            children = null;
+
+            return false;
         }
     }
 }

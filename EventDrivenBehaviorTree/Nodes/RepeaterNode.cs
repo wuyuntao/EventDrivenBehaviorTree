@@ -1,31 +1,37 @@
-﻿using System;
+﻿using System.Collections.Generic;
 
 namespace EventDrivenBehaviorTree.Nodes
 {
     class RepeaterNode : SingleChildNode
     {
-        int totalCount;
-        int count;
+        int m_totalCount;
+        int m_count;
 
-        public RepeaterNode(BehaviorTree tree, ParentNode parent, int totalCount)
+        public RepeaterNode(BehaviorTree tree, Node parent, int totalCount)
             : base(tree, parent)
         {
-            this.totalCount = totalCount;
+            m_totalCount = totalCount;
         }
 
         protected override void OnStart()
         {
-            count = 0;
+            base.OnStart();
 
-            Child.Start();
+            m_count = 0;
         }
 
-        internal override void OnChildEnd(Node child, bool success)
+        protected override bool? OnUpdate(out IEnumerable<Node> children)
         {
-            if (++count >= totalCount)
-                OnEnd(true);
+            if (++m_count <= m_totalCount)
+            {
+                children = new[] { Child };
+                return null;
+            }
             else
-                Child.Start();
+            {
+                children = null;
+                return true;
+            }
         }
     }
 }

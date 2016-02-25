@@ -1,58 +1,42 @@
-﻿using System;
-using System.Linq;
+﻿using System.Collections.Generic;
 
 namespace EventDrivenBehaviorTree.Nodes
 {
     class ParallelNode : MultiChildNode
     {
-        bool[] childrenCompleted;
+        int m_completedCount;
 
-        public ParallelNode(BehaviorTree tree, ParentNode parent)
+        public ParallelNode(BehaviorTree tree, Node parent)
             : base(tree, parent)
         {
         }
 
         protected override void OnStart()
         {
-            childrenCompleted = new bool[Children.Length];
+            m_completedCount = 0;
 
             foreach (var child in Children)
-                child.Start();
+                Tree.Enqueue(child);
         }
 
-        protected override void OnAbort()
+        protected override bool? OnUpdate(out IEnumerable<Node> children)
         {
-            AbortChildren();
-
-            base.OnAbort();
+            children = null;
+            if (++m_completedCount >= Children.Length)
+                return true;
+            else
+                return null;
         }
 
-        internal override void OnChildEnd(Node child, bool success)
+        protected override void OnEnd()
         {
-            var index = Array.FindIndex(Children, c => c == child);
-            if (index >= 0)
+            if (LastStatus == null)
             {
-                if (success)
-                {
-                    childrenCompleted[index] = success;
-                    if (childrenCompleted.All(c => c))
-                        OnEnd(true);
-                }
-                else
-                {
-                    AbortChildren();
-                    OnEnd(false);
-                }
+                foreach (var child in Children)
+                    child.Abort();
             }
-        }
 
-        private void AbortChildren()
-        {
-            for (int i = 0; i < Children.Length; i++)
-            {
-                if (!childrenCompleted[i])
-                    Children[i].Abort();
-            }
+            base.OnEnd();
         }
     }
 }

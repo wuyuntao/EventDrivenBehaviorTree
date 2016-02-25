@@ -7,71 +7,63 @@ namespace EventDrivenBehaviorTree
 {
     public class BehaviorTree : EventBus.IPublisher
     {
-        Node root;
+        BehaviorTreeManager m_manager;
+        Node m_root;
         EventBus m_eventBus = new EventBus();
-        List<Timer> timers = new List<Timer>();
-        uint time;
+        List<Node> m_pendingQueue = new List<Node>();
 
-        public void Start()
+        public BehaviorTree(BehaviorTreeManager manager)
         {
-            root.Start();
+            m_manager = manager;
         }
 
-        public void Update(uint deltaTime)
+        public void Update()
         {
-            time += deltaTime;
-
-            timers.RemoveAll(t =>
+            if (m_pendingQueue.Count > 0)
             {
-                if (t.Time <= time)
+                var currentQueue = new List<Node>();
+                while (m_pendingQueue.Count > 0)
                 {
-                    m_eventBus.Publish(this, new TimeoutEventArgs(t.GetHashCode()));
-                    return true;
+                    // Swap
+                    var queue = currentQueue;
+                    currentQueue = m_pendingQueue;
+                    m_pendingQueue = queue;
+
+                    // Update nodes
+                    foreach (var node in currentQueue)
+                        node.Update();
+
+                    currentQueue.Clear();
                 }
-                else
-                    return false;
-            });
+            }
         }
 
-        public int SetTimer(Node node, uint time)
+        internal void Enqueue(Node node)
         {
-            var timer = new Timer(node, time);
-            timers.Add(timer);
-            return timer.GetHashCode();
+            if (!m_pendingQueue.Contains(node))
+                m_pendingQueue.Add(node);
         }
 
-        public void CancelTimer(int timerId)
+        public BehaviorTreeManager Manager
         {
-            timers.RemoveAll(t => t.GetHashCode() == timerId);
+            get { return m_manager; }
         }
 
         public Node Root
         {
-            get { return root; }
+            get { return m_root; }
             internal set
             {
-                if (root != null)
+                if (m_root != null)
                     throw new InvalidOperationException();
 
-                root = value;
+                m_root = value;
             }
         }
 
         public EventBus EventBus
         {
             get { return m_eventBus; }
-        }
-
-        class Timer
-        {
-            public readonly uint Time;
-            public readonly Node Node;
-
-            public Timer(Node node, uint time)
-            {
-                Time = time;
-                Node = node;
-            }
         }
     }
 }
