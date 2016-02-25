@@ -1,28 +1,20 @@
-﻿namespace EventDrivenBehaviorTree
+﻿namespace EventDrivenBehaviorTree.Nodes
 {
     class ReturnFalseNode : SingleChildNode
     {
-        public ReturnFalseNode(BehaviorTree tree, Node parent)
+        public ReturnFalseNode(BehaviorTree tree, ParentNode parent)
             : base(tree, parent)
         {
         }
 
-        public override void OnStart()
+        protected override void OnStart()
         {
-            Tree.OnNodeEvent += Tree_OnNodeEvent;
-            Child.OnStart();
+            Child.Start();
         }
 
-        private void Tree_OnNodeEvent(Node sender, EventArgs eventArgs)
+        internal override void OnChildEnd(Node child, bool success)
         {
-            if (sender == Child && eventArgs is NodeFinishedEventArgs)
-                OnEnd(false);
-        }
-
-        protected override void OnEnd(bool success)
-        {
-            Tree.OnNodeEvent -= Tree_OnNodeEvent;
-            base.OnEnd(success);
+            OnEnd(false);
         }
     }
 }

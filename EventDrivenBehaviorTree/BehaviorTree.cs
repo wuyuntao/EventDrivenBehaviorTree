@@ -5,10 +5,10 @@ using System.Collections.Generic;
 
 namespace EventDrivenBehaviorTree
 {
-    class BehaviorTree : EventObject
+    public class BehaviorTree : EventBus.IPublisher
     {
         Node root;
-
+        EventBus m_eventBus = new EventBus();
         List<Timer> timers = new List<Timer>();
         uint time;
 
@@ -25,7 +25,7 @@ namespace EventDrivenBehaviorTree
             {
                 if (t.Time <= time)
                 {
-                    t.Node.Publish(new TimeoutEventArgs(t.GetHashCode()));
+                    m_eventBus.Publish(this, new TimeoutEventArgs(t.GetHashCode()));
                     return true;
                 }
                 else
@@ -45,21 +45,21 @@ namespace EventDrivenBehaviorTree
             timers.RemoveAll(t => t.GetHashCode() == timerId);
         }
 
-        protected override void OnEvent(EventObject publisher, EventArgs eventArgs)
-        {
-            Publish(eventArgs);
-        }
-
         public Node Root
         {
             get { return root; }
-            set
+            internal set
             {
                 if (root != null)
                     throw new InvalidOperationException();
 
                 root = value;
             }
+        }
+
+        public EventBus EventBus
+        {
+            get { return m_eventBus; }
         }
 
         class Timer

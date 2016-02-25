@@ -2,11 +2,11 @@
 
 namespace EventDrivenBehaviorTree.Nodes
 {
-    abstract class SingleChildNode : Node
+    public abstract class SingleChildNode : ParentNode
     {
         Node child;
 
-        protected SingleChildNode(BehaviorTree tree, Node parent)
+        protected SingleChildNode(BehaviorTree tree, ParentNode parent)
             : base(tree, parent)
         {
         }

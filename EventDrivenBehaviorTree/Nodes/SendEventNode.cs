@@ -1,19 +1,21 @@
-﻿namespace EventDrivenBehaviorTree
+﻿using EventDrivenBehaviorTree.Events;
+using System;
+
+namespace EventDrivenBehaviorTree.Nodes
 {
-    class SendEventNode : LeafNode
+    class SendEventNode : LeafNode, EventBus.IPublisher
     {
         EventArgs eventArgs;
 
-        public SendEventNode(BehaviorTree tree, Node parent, EventArgs eventArgs)
+        public SendEventNode(BehaviorTree tree, ParentNode parent, EventArgs eventArgs)
             : base(tree, parent)
         {
             this.eventArgs = eventArgs;
         }
 
-        public override void OnStart()
+        protected override void OnStart()
         {
-            Tree.SendEvent(this, eventArgs);
-            Tree.SendEvent(this, new NodeFinishedEventArgs(true));
+            Tree.EventBus.Publish(this, eventArgs);
         }
     }
 }

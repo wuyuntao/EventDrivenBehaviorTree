@@ -1,41 +1,37 @@
 ﻿using System;
 using System.Linq;
 
-namespace EventDrivenBehaviorTree
+namespace EventDrivenBehaviorTree.Nodes
 {
-    class ParallelSelectorNode : MultiChildNode
+    class ParalleSelectorlNode : MultiChildNode
     {
         bool[] childrenCompleted;
 
-        public ParallelSelectorNode(BehaviorTree tree, Node parent)
+        public ParalleSelectorlNode(BehaviorTree tree, ParentNode parent)
             : base(tree, parent)
         {
         }
 
-        public override void OnStart()
+        protected override void OnStart()
         {
             childrenCompleted = new bool[Children.Length];
 
-            Tree.OnNodeEvent += Tree_OnNodeEvent;
-
             foreach (var child in Children)
-            {
-                child.OnStart();
-            }
+                child.Start();
         }
 
-        public override void OnAbort()
+        protected override void OnAbort()
         {
             AbortChildren();
+
             base.OnAbort();
         }
 
-        private void Tree_OnNodeEvent(Node sender, EventArgs eventArgs)
+        internal override void OnChildEnd(Node child, bool success)
         {
-            var index = Array.FindIndex(Children, c => c == sender);
-            if (index >= 0 && eventArgs is NodeFinishedEventArgs)
+            var index = Array.FindIndex(Children, c => c == child);
+            if (index >= 0)
             {
-                var success = ((NodeFinishedEventArgs)eventArgs).Success;
                 if (!success)
                 {
                     childrenCompleted[index] = success;
@@ -50,12 +46,12 @@ namespace EventDrivenBehaviorTree
             }
         }
 
-        private void AbortChildren()
+        void AbortChildren()
         {
             for (int i = 0; i < Children.Length; i++)
             {
                 if (!childrenCompleted[i])
-                    Children[i].OnAbort();
+                    Children[i].Abort();
             }
         }
     }

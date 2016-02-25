@@ -3,11 +3,11 @@ using EventDrivenBehaviorTree.Events;
 
 namespace EventDrivenBehaviorTree.Nodes
 {
-    class WaitEventNode : LeafNode
+    class WaitEventNode : LeafNode, EventBus.ISubscriber
     {
         Type eventType;
 
-        public WaitEventNode(BehaviorTree tree, Node parent, Type eventType)
+        public WaitEventNode(BehaviorTree tree, ParentNode parent, Type eventType)
             : base(tree, parent)
         {
             this.eventType = eventType;
@@ -15,19 +15,16 @@ namespace EventDrivenBehaviorTree.Nodes
 
         protected override void OnStart()
         {
-            Tree.Subscribe(this, eventType);
+            Tree.EventBus.Subscribe(this, eventType);
         }
 
-        protected override void OnEvent(EventObject publisher, EventArgs eventArgs)
+        void EventBus.ISubscriber.OnEvent(EventBus.IPublisher publisher, EventArgs eventArgs)
         {
-            End(true);
-        }
-
-        protected override void OnEnd(bool success)
-        {
-            Tree.Unsubscribe(this);
-
-            base.OnEnd(success);
+            if (eventArgs.GetType() == eventType)
+            {
+                Tree.EventBus.Unsubscribe(this);
+                End(true);
+            }
         }
     }
 }

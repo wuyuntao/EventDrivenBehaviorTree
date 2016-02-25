@@ -1,53 +1,40 @@
-﻿namespace EventDrivenBehaviorTree
+﻿namespace EventDrivenBehaviorTree.Nodes
 {
-    class SequenceNode : MultiChildNode
+    public class SequenceNode : MultiChildNode
     {
         int currentIndex;
 
-        public SequenceNode(BehaviorTree tree, Node parent)
+        public SequenceNode(BehaviorTree tree, ParentNode parent)
             : base(tree, parent)
         {
         }
 
-        public override void OnStart()
+        protected override void OnStart()
         {
             currentIndex = 0;
 
-            Tree.OnNodeEvent += Tree_OnNodeEvent;
-
-            Children[currentIndex].OnStart();
+            Children[currentIndex].Start();
 
         }
 
-        private void Tree_OnNodeEvent(Node sender, EventArgs eventArgs)
+        internal override void OnChildEnd(Node child, bool success)
         {
-            var child = Children[currentIndex];
-            if (child == sender && eventArgs is NodeFinishedEventArgs)
+            if (success)
             {
-                var finishedEventArgs = (NodeFinishedEventArgs)eventArgs;
-                if (finishedEventArgs.Success)
-                {
-                    if (++currentIndex < Children.Length)
-                    {
-                        Children[currentIndex].OnStart();
-                    }
-                    else
-                    {
-                        OnEnd(true);
-                    }
-                }
+                if (++currentIndex < Children.Length)
+                    Children[currentIndex].Start();
                 else
-                {
-                    OnEnd(false);
-                }
+                    OnEnd(true);
             }
+            else
+                OnEnd(false);
         }
 
-        protected override void OnEnd(bool success)
+        protected override void OnAbort()
         {
-            Tree.OnNodeEvent -= Tree_OnNodeEvent;
+            Children[currentIndex].Abort();
 
-            base.OnEnd(success);
+            base.OnAbort();
         }
     }
 }

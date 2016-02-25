@@ -41,14 +41,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BehaviorTree.cs" />
-    <Compile Include="Events\EventObject.cs" />
-    <Compile Include="Events\NodeStartedEventArgs.cs" />
+    <Compile Include="Events\EventBus.cs" />
     <Compile Include="Nodes\LeafNode.cs" />
     <Compile Include="Nodes\MultiChildNode.cs" />
     <Compile Include="Nodes\Node.cs" />
-    <Compile Include="Events\NodeCompletedEventArgs.cs" />
     <Compile Include="Nodes\ParallelNode.cs" />
     <Compile Include="Nodes\ParallelSelectorNode.cs" />
+    <Compile Include="Nodes\ParentNode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Nodes\RepeaterNode.cs" />
     <Compile Include="Nodes\ReturnFalseNode.cs" />
