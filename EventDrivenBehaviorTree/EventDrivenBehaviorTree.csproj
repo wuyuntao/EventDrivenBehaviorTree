@@ -55,7 +55,7 @@
     <Compile Include="Events\TimeoutEventArgs.cs" />
     <Compile Include="Nodes\WaitEventNode.cs" />
     <Compile Include="Nodes\WaitNode.cs" />
-    <Compile Include="BehaviorTreeManager.cs" />
+    <Compile Include="Timer.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

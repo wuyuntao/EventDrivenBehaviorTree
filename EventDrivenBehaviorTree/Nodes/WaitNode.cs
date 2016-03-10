@@ -14,7 +14,7 @@ namespace EventDrivenBehaviorTree.Nodes
 
         protected override void OnStart()
         {
-            Tree.Manager.SetTimer(this, time);
+            Tree.SetTimer(this, time);
         }
 
         protected override bool? OnUpdate(out IEnumerable<Node> children)
